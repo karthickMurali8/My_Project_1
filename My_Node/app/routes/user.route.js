@@ -8,7 +8,7 @@ module.exports = app => {
     router.get('/:id', user.findOne);
     router.put('/:id', user.update);
     router.delete('/:id', user.delete);
-    router.get('/isMarried', user.findAllMarriedUsers);
+    router.get('/isMarried/:isMarried', user.findByMaritalStatus);
 
     app.use('/api/users', router);
 }

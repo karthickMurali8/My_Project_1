@@ -77,9 +77,9 @@ exports.findOne = (req, res) => {
 
 exports.update = (req, res) => {
     if (req.params.id && Object.keys(req.body)?.length) {
-        user.update(req.params.id)
+        user.update(req.body, { where: { id : Number(req.params.id) } })
         .then(data => {
-            if (data === 1) {
+            if (data[0] === 1) {
                 res.status(200).send(getMessageObject('User was updated successfully !'));
             } else {
                 res.status(500).send(getMessageObject(`Unable to update user with ID : ${req.params.id}`));
@@ -94,10 +94,8 @@ exports.update = (req, res) => {
 }
 
 exports.delete = (req, res) => {
-    const id = req.params.id;
-  
     user.destroy({
-      where: { id: id }
+      where: { id: req.params.id }
     })
       .then(num => {
         if (num == 1) {
@@ -130,12 +128,17 @@ exports.deleteAll = (req, res) => {
           message:
             err.message || "Some error occurred while removing all users."
         });
-      });
+    });
 };
 
-exports.findAllMarriedUsers = (req, res) => {
-    user.findAll({ where: { isMarried: true } })
-      .then(data => {
+exports.findByMaritalStatus = (req, res) => {
+    user.findAll(
+        { where: 
+            { 
+                isMarried: req.params.isMarried === 'true' || req.params.isMarried == 1 ? 1 : 0 
+            } 
+        }
+    ).then(data => {
         res.send(data);
       })
       .catch(err => {
@@ -143,7 +146,7 @@ exports.findAllMarriedUsers = (req, res) => {
           message:
             err.message || "Some error occurred while retrieving users."
         });
-      });
+    });
 };
 
 function getMessageObject(str) {
